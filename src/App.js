@@ -52,6 +52,7 @@ const average = (arr) =>
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <>
@@ -61,10 +62,14 @@ export default function App() {
       </Navbar>
 
       <Main>
-        <MovieBox>
+        <Box>
           <MovieList movies={movies} />
-        </MovieBox>
-        <WatchBox />
+        </Box>
+
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMovieList watched={watched} />
+        </Box>
       </Main>
     </>
   );
@@ -114,7 +119,7 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function MovieBox({ children }) {
+function Box({ children }) {
   const [isOpen1, setIsOpen1] = useState(true);
 
   return (
@@ -125,6 +130,7 @@ function MovieBox({ children }) {
       >
         {isOpen1 ? "–" : "+"}
       </button>
+
       {isOpen1 && children}
     </div>
   );
@@ -155,6 +161,7 @@ function Movie({ movie }) {
   );
 }
 
+/*
 function WatchBox() {
   const [watched, setWatched] = useState(tempWatchedData);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -176,6 +183,7 @@ function WatchBox() {
     </div>
   );
 }
+*/
 
 function WatchedSummary({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
