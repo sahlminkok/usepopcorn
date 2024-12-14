@@ -94,6 +94,7 @@ export default function App() {
       return;
     }
 
+    handleCloseMovie();
     fetchMovies();
 
     return () => controller.abort();
@@ -338,6 +339,16 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
     return () => (document.title = "usePopcorn");
   }, [title]);
+
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === "Escape") onCloseMovie();
+    }
+
+    document.addEventListener("keydown", callback);
+
+    return () => document.removeEventListener("keydown", callback);
+  }, [onCloseMovie]);
 
   return (
     <div className="details">
