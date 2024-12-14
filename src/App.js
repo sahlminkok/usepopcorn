@@ -61,40 +61,43 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  useEffect(
-    function () {
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-          );
+  useEffect(() => {
+    const controller = new AbortController();
 
-          if (!res.ok)
-            throw new Error("Something went wrong while fetching the Movies");
-
-          const data = await res.json();
-
-          if (data.Response === "False") throw new Error("Movie not found");
-          setMovies(data.Search);
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setMovies([]);
+    async function fetchMovies() {
+      try {
+        setIsLoading(true);
         setError("");
-        return;
-      }
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          { signal: controller.signal }
+        );
 
-      fetchMovies();
-    },
-    [query]
-  );
+        if (!res.ok)
+          throw new Error("Something went wrong while fetching the Movies");
+
+        const data = await res.json();
+
+        if (data.Response === "False") throw new Error("Movie not found");
+        setMovies(data.Search);
+        setError("");
+      } catch (error) {
+        if (error.name !== "AbortError") setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (query.length < 3) {
+      setMovies([]);
+      setError("");
+      return;
+    }
+
+    fetchMovies();
+
+    return () => controller.abort();
+  }, [query]);
 
   function handleIdSelection(id) {
     setSelectedId((selectedId) => (selectedId === id ? null : id));
